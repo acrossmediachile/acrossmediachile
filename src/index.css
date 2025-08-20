@@ -17,24 +17,39 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 211 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 211 100% 65%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 280 85% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 25 95% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 45%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 15% 90%;
+    --input: 220 15% 95%;
+    --ring: 211 100% 45%;
+
+    /* Gradientes profesionales */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-card: linear-gradient(180deg, hsl(var(--secondary)), hsl(var(--accent)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+
+    /* Sombras elegantes */
+    --shadow-elegant: 0 10px 40px -10px hsl(var(--primary) / 0.2);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.3);
+    --shadow-card: 0 4px 20px -2px hsl(var(--primary) / 0.1);
+
+    /* Animaciones suaves */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --radius: 0.5rem;
 
@@ -101,5 +116,76 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Componentes del design system */
+  .btn-hero {
+    @apply bg-gradient-to-r from-primary to-secondary text-primary-foreground;
+    @apply px-8 py-4 rounded-lg font-semibold text-lg;
+    @apply shadow-elegant hover:shadow-glow transition-all duration-300;
+    @apply hover:scale-105 hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground;
+    @apply px-6 py-3 rounded-lg font-medium;
+    @apply shadow-card hover:shadow-elegant transition-all duration-300;
+    @apply hover:scale-105;
+  }
+
+  .card-service {
+    @apply bg-card border border-border rounded-xl p-6;
+    @apply shadow-card hover:shadow-elegant transition-all duration-300;
+    @apply hover:-translate-y-2 hover:scale-[1.02];
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent;
+    @apply bg-clip-text text-transparent font-bold;
+  }
+
+  .floating-element {
+    @apply animate-bounce;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+  }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .animate-rotate-cube:hover {
+    animation-play-state: paused;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
   }
 }
