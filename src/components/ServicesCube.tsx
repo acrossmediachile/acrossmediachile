@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowRight, Globe, Video, TrendingUp, Users, Target, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +13,10 @@ interface ServiceFace {
 
 const ServicesCube = () => {
   const [currentFace, setCurrentFace] = useState(0);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const cubeRef = useRef<HTMLDivElement>(null);
 
   const services: ServiceFace[] = [
     {
@@ -58,7 +62,62 @@ const ServicesCube = () => {
 
   const handleFaceChange = (index: number) => {
     setCurrentFace(index);
+    setRotation({ x: 0, y: index * 120 });
   };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    setRotation(prev => ({
+      x: prev.x + deltaY * 0.5,
+      y: prev.y + deltaX * 0.5
+    }));
+    
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setIsDragging(false);
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      
+      setRotation(prev => ({
+        x: prev.x + deltaY * 0.5,
+        y: prev.y + deltaX * 0.5
+      }));
+      
+      setDragStart({ x: e.clientX, y: e.clientY });
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, dragStart]);
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-subtle">
@@ -78,20 +137,24 @@ const ServicesCube = () => {
           <div className="relative">
             <div className="perspective-1000 w-full h-96 flex items-center justify-center">
               <div 
-                className="relative w-80 h-80 transform-style-preserve-3d animate-rotate-cube hover:pause cursor-pointer"
+                ref={cubeRef}
+                className="relative w-80 h-80 transform-style-preserve-3d cursor-grab select-none"
                 style={{ 
-                  transform: `rotateY(${currentFace * 120}deg)`,
-                  transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                  transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+                  transition: isDragging ? 'none' : 'transform 0.3s ease-out'
                 }}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
               >
                 {services.map((service, index) => (
                   <div
                     key={index}
-                    className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 cursor-pointer hover:shadow-glow transition-all duration-300`}
+                    className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 hover:shadow-glow transition-all duration-300 pointer-events-none`}
                     style={{
                       transform: `rotateY(${index * 120}deg) translateZ(140px)`,
                     }}
-                    onClick={() => handleFaceChange(index)}
                   >
                     <div className="text-center space-y-6">
                       <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
@@ -125,6 +188,13 @@ const ServicesCube = () => {
                   }`}
                 />
               ))}
+            </div>
+            
+            {/* Instruction text */}
+            <div className="text-center mt-4">
+              <p className="text-sm text-muted-foreground">
+                🖱️ Arrastra para rotar | 👆 Click en los puntos para navegar
+              </p>
             </div>
           </div>
 
