@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ArrowRight, Globe, Video, TrendingUp, Users, Target, BarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ContactModal from "./ContactModal";
 
 interface ServiceFace {
   icon: React.ReactNode;
@@ -16,6 +17,8 @@ const ServicesCube = () => {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const cubeRef = useRef<HTMLDivElement>(null);
 
   const services: ServiceFace[] = [
@@ -92,6 +95,19 @@ const ServicesCube = () => {
     setIsDragging(false);
   };
 
+  // Auto rotation effect
+  useEffect(() => {
+    if (!isDragging && !isHovering) {
+      const interval = setInterval(() => {
+        setRotation(prev => ({
+          x: prev.x,
+          y: prev.y + 0.5
+        }));
+      }, 50);
+      return () => clearInterval(interval);
+    }
+  }, [isDragging, isHovering]);
+
   useEffect(() => {
     const handleGlobalMouseUp = () => setIsDragging(false);
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -144,9 +160,28 @@ const ServicesCube = () => {
                   transition: isDragging ? 'none' : 'transform 0.3s ease-out'
                 }}
                 onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => {
+                  setIsHovering(false);
+                  handleMouseLeave();
+                }}
+                onMouseMove={(e) => {
+                  if (isHovering && !isDragging) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const deltaX = (e.clientX - centerX) * 0.1;
+                    const deltaY = (e.clientY - centerY) * -0.1;
+                    
+                    setRotation(prev => ({
+                      x: deltaY,
+                      y: deltaX
+                    }));
+                  } else if (isDragging) {
+                    handleMouseMove(e);
+                  }
+                }}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
               >
                 {services.map((service, index) => (
                   <div
@@ -224,7 +259,10 @@ const ServicesCube = () => {
                 ))}
               </div>
 
-              <Button className="btn-secondary group w-full">
+              <Button 
+                className="btn-secondary group w-full"
+                onClick={() => setIsContactModalOpen(true)}
+              >
                 {services[currentFace].cta}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -248,6 +286,11 @@ const ServicesCube = () => {
           </div>
         </div>
       </div>
+
+      <ContactModal 
+        isOpen={isContactModalOpen} 
+        onClose={() => setIsContactModalOpen(false)} 
+      />
     </section>
   );
 };

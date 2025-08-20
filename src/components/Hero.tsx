@@ -1,9 +1,14 @@
-import { ArrowRight, Play, Star } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-image.jpg";
+import { useState } from "react";
+import BookingModal from "./BookingModal";
 
 const Hero = () => {
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
   return (
+    <>
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background with gradient overlay */}
       <div className="absolute inset-0 bg-gradient-hero opacity-90"></div>
@@ -15,7 +20,7 @@ const Hero = () => {
       {/* Floating elements */}
       <div className="absolute top-20 left-10 floating-element">
         <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center">
-          <Star className="w-8 h-8 text-accent" />
+          <div className="w-8 h-8 bg-accent rounded-full"></div>
         </div>
       </div>
       <div className="absolute bottom-32 right-16 floating-element" style={{ animationDelay: '1s' }}>
@@ -39,7 +44,7 @@ const Hero = () => {
           </div>
 
           {/* Main headline */}
-          <div className="space-y-4">
+          <div className="space-y-4" style={{ marginTop: '20px' }}>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
               Potenciamos tu empresa con{" "}
               <span className="bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
@@ -71,7 +76,10 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Button className="btn-hero group">
+            <Button 
+              className="btn-hero group"
+              onClick={() => setIsBookingModalOpen(true)}
+            >
               Agenda tu consulta gratuita
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -84,21 +92,6 @@ const Hero = () => {
             </Button>
           </div>
 
-          {/* Trust indicators */}
-          <div className="pt-16">
-            <p className="text-white/70 text-sm mb-6">Casos de éxito reconocidos por:</p>
-            <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-              <div className="bg-white/10 px-6 py-3 rounded-lg backdrop-blur-sm">
-                <span className="text-white font-medium">Google Partners</span>
-              </div>
-              <div className="bg-white/10 px-6 py-3 rounded-lg backdrop-blur-sm">
-                <span className="text-white font-medium">Meta Business</span>
-              </div>
-              <div className="bg-white/10 px-6 py-3 rounded-lg backdrop-blur-sm">
-                <span className="text-white font-medium">HubSpot Certified</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -108,7 +101,13 @@ const Hero = () => {
           <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>
+
+      <BookingModal 
+        isOpen={isBookingModalOpen} 
+        onClose={() => setIsBookingModalOpen(false)} 
+      />
     </section>
+    </>
   );
 };
 
