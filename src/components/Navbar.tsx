@@ -29,10 +29,12 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-hero rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm"></div>
-              </div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/lovable-uploads/cdeeb541-3d69-40af-8ea1-3784a0a3ded3.png" 
+                alt="Across Media Chile - Logo" 
+                className="w-10 h-10 object-contain"
+              />
               <span className="text-xl font-bold gradient-text">Across Media</span>
             </div>
           </div>

@@ -29,10 +29,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company info */}
           <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-hero rounded-lg flex items-center justify-center">
-                <div className="w-5 h-5 bg-white rounded-sm"></div>
-              </div>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/lovable-uploads/cdeeb541-3d69-40af-8ea1-3784a0a3ded3.png" 
+                alt="Across Media Chile - Agencia de Marketing Digital" 
+                className="w-12 h-12 object-contain"
+              />
               <span className="text-2xl font-bold gradient-text">Across Media</span>
             </div>
             <p className="text-muted-foreground leading-relaxed">

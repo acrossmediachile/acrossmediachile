@@ -30,7 +30,11 @@ const Hero = () => {
         <div className="space-y-8">
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-            <Star className="w-4 h-4 text-accent mr-2" />
+            <img 
+              src="/lovable-uploads/cdeeb541-3d69-40af-8ea1-3784a0a3ded3.png" 
+              alt="Across Media" 
+              className="w-5 h-5 mr-2 object-contain"
+            />
             <span className="text-white text-sm font-medium">A la vanguardia por excelencia</span>
           </div>
 
