@@ -1,6 +1,6 @@
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-image.jpg";
+import heroImage from "/lovable-uploads/9af34994-e98a-48b1-9413-e1883ba17b88.png";
 import { useState } from "react";
 import BookingModal from "./BookingModal";
 
