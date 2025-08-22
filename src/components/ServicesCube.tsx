@@ -22,6 +22,8 @@ const ServicesCube = () => {
     y: 0
   });
   const [isHovering, setIsHovering] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const cubeRef = useRef<HTMLDivElement>(null);
   const services: ServiceFace[] = [{
@@ -55,29 +57,49 @@ const ServicesCube = () => {
   };
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
+    setScale(0.95);
     setDragStart({
       x: e.clientX,
       y: e.clientY
     });
+    (e.currentTarget as HTMLElement).style.cursor = 'grabbing';
   };
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
     const deltaX = e.clientX - dragStart.x;
     const deltaY = e.clientY - dragStart.y;
     setRotation(prev => ({
-      x: prev.x + deltaY * 0.5,
-      y: prev.y + deltaX * 0.5
+      x: Math.max(-45, Math.min(45, prev.x + deltaY * 0.8)),
+      y: prev.y + deltaX * 0.8
     }));
     setDragStart({
       x: e.clientX,
       y: e.clientY
     });
   };
+
   const handleMouseUp = () => {
     setIsDragging(false);
+    setScale(1);
+    if (cubeRef.current) {
+      cubeRef.current.style.cursor = 'grab';
+    }
   };
+
   const handleMouseLeave = () => {
     setIsDragging(false);
+    setScale(1);
+    setIsHovering(false);
+    if (cubeRef.current) {
+      cubeRef.current.style.cursor = 'grab';
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
+    setScale(prev => Math.max(0.7, Math.min(1.3, prev * zoomFactor)));
   };
 
   // Auto rotation effect
@@ -132,22 +154,27 @@ const ServicesCube = () => {
           {/* Interactive Cube */}
           <div className="relative">
             <div className="perspective-1000 w-full h-96 flex items-center justify-center">
-              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d cursor-grab select-none" style={{
-              transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-              transition: isDragging ? 'none' : 'transform 0.3s ease-out'
-            }} onMouseDown={handleMouseDown} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => {
+              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d cursor-grab select-none hover:scale-105 active:scale-95" style={{
+              transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
+              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }} onMouseDown={handleMouseDown} onMouseEnter={() => {
+              setIsHovering(true);
+              setScale(1.05);
+            }} onMouseLeave={() => {
               setIsHovering(false);
+              setScale(1);
               handleMouseLeave();
-            }} onMouseMove={e => {
+            }} onWheel={handleWheel} onMouseMove={e => {
               if (isHovering && !isDragging) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
-                const deltaX = (e.clientX - centerX) * 0.1;
-                const deltaY = (e.clientY - centerY) * -0.1;
+                const deltaX = (e.clientX - centerX) * 0.15;
+                const deltaY = (e.clientY - centerY) * -0.15;
+                setMousePosition({ x: deltaX, y: deltaY });
                 setRotation(prev => ({
-                  x: deltaY,
-                  y: deltaX
+                  x: Math.max(-20, Math.min(20, deltaY)),
+                  y: prev.y + deltaX * 0.01
                 }));
               } else if (isDragging) {
                 handleMouseMove(e);
@@ -180,7 +207,7 @@ const ServicesCube = () => {
             {/* Instruction text */}
             <div className="text-center mt-4">
               <p className="text-sm text-muted-foreground">
-                🖱️ Arrastra para rotar | 👆 Click en los puntos para navegar
+                🖱️ Arrastra para rotar | 🎯 Hover para efecto parallax | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
               </p>
             </div>
           </div>
