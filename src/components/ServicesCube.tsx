@@ -16,11 +16,6 @@ const ServicesCube = () => {
     x: 0,
     y: 0
   });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({
-    x: 0,
-    y: 0
-  });
   const [isHovering, setIsHovering] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
@@ -55,45 +50,9 @@ const ServicesCube = () => {
       y: index * 120
     });
   };
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setScale(0.95);
-    setDragStart({
-      x: e.clientX,
-      y: e.clientY
-    });
-    (e.currentTarget as HTMLElement).style.cursor = 'grabbing';
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
-    setRotation(prev => ({
-      x: Math.max(-45, Math.min(45, prev.x + deltaY * 0.8)),
-      y: prev.y + deltaX * 0.8
-    }));
-    setDragStart({
-      x: e.clientX,
-      y: e.clientY
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setScale(1);
-    if (cubeRef.current) {
-      cubeRef.current.style.cursor = 'grab';
-    }
-  };
-
   const handleMouseLeave = () => {
-    setIsDragging(false);
-    setScale(1);
     setIsHovering(false);
-    if (cubeRef.current) {
-      cubeRef.current.style.cursor = 'grab';
-    }
+    setScale(1);
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -104,7 +63,7 @@ const ServicesCube = () => {
 
   // Auto rotation effect
   useEffect(() => {
-    if (!isDragging && !isHovering) {
+    if (!isHovering) {
       const interval = setInterval(() => {
         setRotation(prev => ({
           x: prev.x,
@@ -113,31 +72,7 @@ const ServicesCube = () => {
       }, 50);
       return () => clearInterval(interval);
     }
-  }, [isDragging, isHovering]);
-  useEffect(() => {
-    const handleGlobalMouseUp = () => setIsDragging(false);
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - dragStart.x;
-      const deltaY = e.clientY - dragStart.y;
-      setRotation(prev => ({
-        x: prev.x + deltaY * 0.5,
-        y: prev.y + deltaX * 0.5
-      }));
-      setDragStart({
-        x: e.clientX,
-        y: e.clientY
-      });
-    };
-    if (isDragging) {
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-    return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [isDragging, dragStart]);
+  }, [isHovering]);
   return <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-subtle">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -154,18 +89,14 @@ const ServicesCube = () => {
           {/* Interactive Cube */}
           <div className="relative">
             <div className="perspective-1000 w-full h-96 flex items-center justify-center">
-              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d cursor-grab select-none hover:scale-105 active:scale-95" style={{
+              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d select-none" style={{
               transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
-              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }} onMouseDown={handleMouseDown} onMouseEnter={() => {
+              transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }} onMouseEnter={() => {
               setIsHovering(true);
               setScale(1.05);
-            }} onMouseLeave={() => {
-              setIsHovering(false);
-              setScale(1);
-              handleMouseLeave();
-            }} onWheel={handleWheel} onMouseMove={e => {
-              if (isHovering && !isDragging) {
+            }} onMouseLeave={handleMouseLeave} onWheel={handleWheel} onMouseMove={e => {
+              if (isHovering) {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
@@ -176,10 +107,8 @@ const ServicesCube = () => {
                   x: Math.max(-20, Math.min(20, deltaY)),
                   y: prev.y + deltaX * 0.01
                 }));
-              } else if (isDragging) {
-                handleMouseMove(e);
               }
-            }} onMouseUp={handleMouseUp}>
+            }}>
                 {services.map((service, index) => <div key={index} className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 hover:shadow-glow transition-all duration-300 pointer-events-none`} style={{
                 transform: `rotateY(${index * 120}deg) translateZ(140px)`
               }}>
@@ -207,7 +136,7 @@ const ServicesCube = () => {
             {/* Instruction text */}
             <div className="text-center mt-4">
               <p className="text-sm text-muted-foreground">
-                🖱️ Arrastra para rotar | 🎯 Hover para efecto parallax | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
+                🎯 Hover para efecto parallax | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
               </p>
             </div>
           </div>
