@@ -17,10 +17,8 @@ const ServicesCube = () => {
     y: 0
   });
   const [isHovering, setIsHovering] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const cubeRef = useRef<HTMLDivElement>(null);
   const services: ServiceFace[] = [{
@@ -52,33 +50,30 @@ const ServicesCube = () => {
       y: index * 120
     });
   };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Normalizar posición del mouse (0 a 1)
+    const normalizedX = x / rect.width;
+    const normalizedY = y / rect.height;
+    
+    // Convertir a rotación (360° completos)
+    const rotationY = normalizedX * 360;
+    const rotationX = (normalizedY - 0.5) * 60; // ±30° en eje X para evitar volteo completo
+    
+    setRotation({
+      x: rotationX,
+      y: rotationY
+    });
+  };
+
   const handleMouseLeave = () => {
     setIsHovering(false);
-    setIsDragging(false);
     setScale(1);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setLastMousePosition({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging) {
-      const deltaX = (e.clientX - lastMousePosition.x) * 0.5;
-      const deltaY = (e.clientY - lastMousePosition.y) * 0.5;
-      
-      setRotation(prev => ({
-        x: prev.x - deltaY,
-        y: prev.y + deltaX
-      }));
-      
-      setLastMousePosition({ x: e.clientX, y: e.clientY });
-    }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -89,16 +84,16 @@ const ServicesCube = () => {
 
   // Auto rotation effect
   useEffect(() => {
-    if (!isHovering && !isDragging) {
+    if (!isHovering) {
       const interval = setInterval(() => {
         setRotation(prev => ({
-          x: prev.x,
+          x: 0,
           y: prev.y + 0.5
         }));
       }, 50);
       return () => clearInterval(interval);
     }
-  }, [isHovering, isDragging]);
+  }, [isHovering]);
   return <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-subtle">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -113,15 +108,21 @@ const ServicesCube = () => {
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Interactive Cube */}
-          <div className="relative">
-            <div className="perspective-1000 w-full h-96 flex items-center justify-center">
-              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d select-none cursor-grab active:cursor-grabbing" style={{
-              transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
-              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }} onMouseEnter={() => {
+          <div 
+            ref={containerRef}
+            className="relative perspective-1000 w-full h-96 flex items-center justify-center cursor-move"
+            onMouseEnter={() => {
               setIsHovering(true);
               setScale(1.05);
-            }} onMouseLeave={handleMouseLeave} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} onWheel={handleWheel}>
+            }}
+            onMouseLeave={handleMouseLeave}
+            onMouseMove={handleMouseMove}
+            onWheel={handleWheel}
+          >
+              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d select-none pointer-events-none" style={{
+              transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
+              transition: isHovering ? 'transform 0.1s linear' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}>
                 {services.map((service, index) => <div key={index} className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 hover:shadow-glow transition-all duration-300 pointer-events-none`} style={{
                 transform: `rotateY(${index * 120}deg) translateZ(140px)`
               }}>
@@ -139,7 +140,6 @@ const ServicesCube = () => {
                     </div>
                   </div>)}
               </div>
-            </div>
 
             {/* Cube Controls */}
             <div className="flex justify-center space-x-4 mt-8">
@@ -149,7 +149,7 @@ const ServicesCube = () => {
             {/* Instruction text */}
             <div className="text-center mt-4">
               <p className="text-sm text-muted-foreground">
-                🖱️ Arrastra para rotar | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
+                🖱️ Mueve el mouse para rotar 360° | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
               </p>
             </div>
           </div>
