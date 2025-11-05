@@ -108,38 +108,40 @@ const ServicesCube = () => {
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Interactive Cube */}
-          <div 
-            ref={containerRef}
-            className="relative perspective-1000 w-full h-96 flex items-center justify-center"
-            onMouseEnter={() => {
-              setIsHovering(true);
-              setScale(1.05);
-            }}
-            onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
-            onWheel={handleWheel}
-          >
+          <div>
+            <div 
+              ref={containerRef}
+              className="relative perspective-1000 w-full h-96 flex items-center justify-center"
+              onMouseEnter={() => {
+                setIsHovering(true);
+                setScale(1.05);
+              }}
+              onMouseLeave={handleMouseLeave}
+              onMouseMove={handleMouseMove}
+              onWheel={handleWheel}
+            >
               <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d select-none pointer-events-none" style={{
-              transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
-              transition: isHovering ? 'transform 0.1s linear' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-                {services.map((service, index) => <div key={index} className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 hover:shadow-glow transition-all duration-300 pointer-events-none`} style={{
-                transform: `rotateY(${index * 120}deg) translateZ(140px)`
+                transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
+                transition: isHovering ? 'transform 0.1s linear' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
               }}>
-                    <div className="text-center space-y-6">
-                      <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                        {service.icon}
-                      </div>
-                      <h3 className="text-2xl font-bold">{service.title}</h3>
-                      <p className="text-lg opacity-90">{service.subtitle}</p>
-                      <div className="space-y-2">
-                        {service.features.slice(0, 2).map((feature, idx) => <div key={idx} className="text-sm opacity-80">
-                            • {feature}
-                          </div>)}
-                      </div>
+                {services.map((service, index) => <div key={index} className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 hover:shadow-glow transition-all duration-300 pointer-events-none`} style={{
+                  transform: `rotateY(${index * 120}deg) translateZ(140px)`
+                }}>
+                  <div className="text-center space-y-6">
+                    <div className="bg-white/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                      {service.icon}
                     </div>
-                  </div>)}
+                    <h3 className="text-2xl font-bold">{service.title}</h3>
+                    <p className="text-lg opacity-90">{service.subtitle}</p>
+                    <div className="space-y-2">
+                      {service.features.slice(0, 2).map((feature, idx) => <div key={idx} className="text-sm opacity-80">
+                        • {feature}
+                      </div>)}
+                    </div>
+                  </div>
+                </div>)}
               </div>
+            </div>
             
             {/* Cube Controls */}
             <div className="flex justify-center space-x-4 mt-8">
