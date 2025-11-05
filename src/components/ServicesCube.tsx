@@ -17,7 +17,9 @@ const ServicesCube = () => {
     y: 0
   });
   const [isHovering, setIsHovering] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [lastMousePosition, setLastMousePosition] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const cubeRef = useRef<HTMLDivElement>(null);
@@ -52,7 +54,31 @@ const ServicesCube = () => {
   };
   const handleMouseLeave = () => {
     setIsHovering(false);
+    setIsDragging(false);
     setScale(1);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setLastMousePosition({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      const deltaX = (e.clientX - lastMousePosition.x) * 0.5;
+      const deltaY = (e.clientY - lastMousePosition.y) * 0.5;
+      
+      setRotation(prev => ({
+        x: prev.x - deltaY,
+        y: prev.y + deltaX
+      }));
+      
+      setLastMousePosition({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -63,7 +89,7 @@ const ServicesCube = () => {
 
   // Auto rotation effect
   useEffect(() => {
-    if (!isHovering) {
+    if (!isHovering && !isDragging) {
       const interval = setInterval(() => {
         setRotation(prev => ({
           x: prev.x,
@@ -72,7 +98,7 @@ const ServicesCube = () => {
       }, 50);
       return () => clearInterval(interval);
     }
-  }, [isHovering]);
+  }, [isHovering, isDragging]);
   return <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-subtle">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -89,26 +115,13 @@ const ServicesCube = () => {
           {/* Interactive Cube */}
           <div className="relative">
             <div className="perspective-1000 w-full h-96 flex items-center justify-center">
-              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d select-none" style={{
+              <div ref={cubeRef} className="relative w-80 h-80 transform-style-preserve-3d select-none cursor-grab active:cursor-grabbing" style={{
               transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale(${scale})`,
-              transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }} onMouseEnter={() => {
               setIsHovering(true);
               setScale(1.05);
-            }} onMouseLeave={handleMouseLeave} onWheel={handleWheel} onMouseMove={e => {
-              if (isHovering) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                const deltaX = (e.clientX - centerX) * 0.15;
-                const deltaY = (e.clientY - centerY) * -0.15;
-                setMousePosition({ x: deltaX, y: deltaY });
-                setRotation(prev => ({
-                  x: Math.max(-20, Math.min(20, deltaY)),
-                  y: prev.y + deltaX * 0.01
-                }));
-              }
-            }}>
+            }} onMouseLeave={handleMouseLeave} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} onWheel={handleWheel}>
                 {services.map((service, index) => <div key={index} className={`absolute inset-0 w-80 h-80 bg-gradient-to-br ${service.color} rounded-2xl shadow-elegant flex flex-col items-center justify-center text-white p-8 hover:shadow-glow transition-all duration-300 pointer-events-none`} style={{
                 transform: `rotateY(${index * 120}deg) translateZ(140px)`
               }}>
@@ -136,7 +149,7 @@ const ServicesCube = () => {
             {/* Instruction text */}
             <div className="text-center mt-4">
               <p className="text-sm text-muted-foreground">
-                🎯 Hover para efecto parallax | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
+                🖱️ Arrastra para rotar | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
               </p>
             </div>
           </div>
