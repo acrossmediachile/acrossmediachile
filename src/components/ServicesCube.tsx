@@ -110,7 +110,7 @@ const ServicesCube = () => {
           {/* Interactive Cube */}
           <div 
             ref={containerRef}
-            className="relative perspective-1000 w-full h-96 flex items-center justify-center cursor-move"
+            className="relative perspective-1000 w-full h-96 flex items-center justify-center"
             onMouseEnter={() => {
               setIsHovering(true);
               setScale(1.05);
