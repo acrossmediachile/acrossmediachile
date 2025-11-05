@@ -140,7 +140,7 @@ const ServicesCube = () => {
                     </div>
                   </div>)}
               </div>
-
+            
             {/* Cube Controls */}
             <div className="flex justify-center space-x-4 mt-8">
               {services.map((_, index) => <button key={index} onClick={() => handleFaceChange(index)} className={`w-4 h-4 rounded-full transition-all duration-300 ${currentFace === index ? 'bg-primary shadow-glow scale-125' : 'bg-muted hover:bg-primary/50'}`} />)}
@@ -149,7 +149,7 @@ const ServicesCube = () => {
             {/* Instruction text */}
             <div className="text-center mt-4">
               <p className="text-sm text-muted-foreground">
-                🖱️ Mueve el mouse para rotar 360° | 🎚️ Scroll para zoom | 👆 Click en los puntos para navegar
+                Mueve el mouse para rotar 360°
               </p>
             </div>
           </div>
