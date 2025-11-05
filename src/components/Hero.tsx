@@ -9,11 +9,11 @@ const Hero = () => {
 
   return (
     <>
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background with gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+      {/* Background with gradient overlay - extends to top */}
+      <div className="absolute inset-0 -top-16 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+        className="absolute inset-0 -top-16 bg-cover bg-center bg-no-repeat opacity-30"
         style={{ backgroundImage: `url(${heroImage})` }}
       ></div>
       
